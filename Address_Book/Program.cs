@@ -120,51 +120,90 @@ namespace Address_Book
 
         // Case 2
 
-        static void ChangeContactInfo(Dictionary<Tuple<string, string>, Tuple<string, Int64>> AddressBook, Tuple<string, string, string, Int64> CurrentUser)
+        static void ChangeContactInfo(Dictionary<Tuple<string, string>, Tuple<string, Int64>> AddressBook)
         {
 
-            var CurrentKey = new Tuple<string, string>(CurrentUser.Item1, CurrentUser.Item2);
+                Console.Write("Unesite broj mobitela osobe cije podatke zelite izmjeniti: ");
+                var inputNumber = Console.ReadLine().Trim();
+                var lookForNumber = Int64.Parse(FormatPhoneNumber(inputNumber));
+                var CurrentUser = new Tuple<string, string, string, Int64>(null, null, null, 0);
 
-            if (AddressBook.ContainsKey(CurrentKey)) { 
-
-                Console.Write("Unesite novo ime: ");
-                var firstName = Console.ReadLine().Trim();
-
-                Console.Write("Unesite novo prezime: ");
-                var lastName = Console.ReadLine().Trim();
-
-                Console.Write("Unesite novu adresu: ");
-                var address = Console.ReadLine().Trim();
-
-                Console.Write("Unesite novi broj mobitela: ");
-                var inputedPhoneNumber = Console.ReadLine().Trim();
-                Int64 phoneNumber = 0;            
-                if (inputedPhoneNumber != "*")
+                foreach (var pair in AddressBook)
                 {
-                    var formatedPhoneNumber = FormatPhoneNumber(inputedPhoneNumber);
-                    phoneNumber = CheckIfPhoneNumberValid(formatedPhoneNumber);
+                    if (pair.Value.Item2 == lookForNumber)
+                    {
+
+                        CurrentUser = new Tuple<string, string, string, Int64>(pair.Key.Item1, pair.Key.Item2, pair.Value.Item1, pair.Value.Item2);
+                        break;
+
+                    }
                 }
 
-                if (firstName == "*") firstName = CurrentUser.Item1;
-                if (lastName == "*") lastName = CurrentUser.Item2;
-                if (address == "*") address = CurrentUser.Item3;
-                if (inputedPhoneNumber == "*") phoneNumber = CurrentUser.Item4;
-               
-                var NewKey = new Tuple<string, string>(firstName, lastName);
-            
-                AddressBook[NewKey] = new Tuple<string, Int64>(address, phoneNumber);
+               var CurrentKey = new Tuple<string, string>(CurrentUser.Item1, CurrentUser.Item2);
 
-                if (firstName != CurrentUser.Item1)
+                if (AddressBook.ContainsKey(CurrentKey))
                 {
-                    AddressBook[NewKey] = AddressBook[CurrentKey];                   
+                    Console.WriteLine("Ako želite sačuvati stare podatke unesite '*' (npr. 'Unesite novo ime: *')");
+                    Console.Write("Unesite novo ime: ");
+                    var firstName = Console.ReadLine().Trim();
+
+                    Console.Write("Unesite novo prezime: ");
+                    var lastName = Console.ReadLine().Trim();
+
+                    Console.Write("Unesite novu adresu: ");
+                    var address = Console.ReadLine().Trim();
+
+                    Console.Write("Unesite novi broj mobitela: ");
+                    var inputedPhoneNumber = Console.ReadLine().Trim();
+                    Int64 phoneNumber = 0;
+                    if (inputedPhoneNumber != "*")
+                    {
+                        var formatedPhoneNumber = FormatPhoneNumber(inputedPhoneNumber);
+                        phoneNumber = CheckIfPhoneNumberValid(formatedPhoneNumber);
+                    }
+
+                    if (firstName == "*") firstName = CurrentUser.Item1;
+                    if (lastName == "*") lastName = CurrentUser.Item2;
+                    if (address == "*") address = CurrentUser.Item3;
+                    if (inputedPhoneNumber == "*") phoneNumber = CurrentUser.Item4;
+
+                    AddressBook.Remove(CurrentKey);
+                    AddressBook.Add(new Tuple<string, string>(firstName, lastName), new Tuple<string, Int64>(address, phoneNumber));
                 }
-
-                AddressBook.Remove(CurrentKey);
-
-            }
-            else Console.WriteLine("Osoba nije pronađena (već je promijenjena ili izbrisana)!");
+                else Console.WriteLine("Osoba nije pronađena!");           
         }
         
+        // Case 3
+
+        static void RemoveInput(Dictionary<Tuple<string, string>, Tuple<string, Int64>> AddressBook)
+        {
+            Console.Write("Unesite broj mobitela osobe cije podatke zelite izbrisati: ");
+            var inputNumber = Console.ReadLine().Trim();
+            var lookForNumber = Int64.Parse(FormatPhoneNumber(inputNumber));
+            var CurrentUser = new Tuple<string, string, string, Int64>(null, null, null, 0);
+
+            foreach (var pair in AddressBook)
+            {
+                if (pair.Value.Item2 == lookForNumber)
+                {
+
+                    CurrentUser = new Tuple<string, string, string, Int64>(pair.Key.Item1, pair.Key.Item2, pair.Value.Item1, pair.Value.Item2);
+                    break;
+
+                }
+            }
+
+            var CurrentKey = new Tuple<string, string>(CurrentUser.Item1, CurrentUser.Item2);
+            if (AddressBook.ContainsKey(new Tuple<string, string>(CurrentUser.Item1, CurrentUser.Item2)))
+            {
+
+                AddressBook.Remove(new Tuple<string, string>(CurrentUser.Item1, CurrentUser.Item2));
+
+            }
+            else Console.WriteLine("Osoba nije pronađena!");
+            Continue();
+        }
+
         // Case 4
 
         static void LookForNumber(Dictionary<Tuple<string, string>, Tuple<string, Int64>> AddressBook)
@@ -248,7 +287,6 @@ namespace Address_Book
             var formatedPhoneNumber = FormatPhoneNumber(inputedPhoneNumber);
             Int64 phoneNumber = CheckIfPhoneNumberValid(formatedPhoneNumber);
 
-            var CurrentUser = new Tuple<string, string, string, Int64>(firstName, lastName, address, phoneNumber);
             var AddressBook = new Dictionary<Tuple<string, string>, Tuple<string, Int64>>();
             AddressBook.Add(new Tuple<string, string>(firstName, lastName), new Tuple<string, Int64>(address, phoneNumber));
 
@@ -265,8 +303,15 @@ namespace Address_Book
                 {
                     case "1":
 
-                        AddNewContact(AddressBook);
-                        Continue();
+                        Console.Write("Jeste li sigurni da želite dodati novi upis? (1) ");
+                        option = Console.ReadLine().Trim();
+
+                        if (option == "1")
+                        {
+                            AddNewContact(AddressBook);
+                            Continue();
+                        }
+                        else option = "0";
                         break;
 
                     case "2":
@@ -277,7 +322,7 @@ namespace Address_Book
                         if (option == "2")
                         {
 
-                            ChangeContactInfo(AddressBook, CurrentUser);
+                            ChangeContactInfo(AddressBook);
                             Continue();
 
                         }
@@ -292,15 +337,7 @@ namespace Address_Book
 
                         if (option == "3")
                         {
-
-                            if (AddressBook.ContainsKey(new Tuple<string, string>(CurrentUser.Item1, CurrentUser.Item2)))
-                            {
-
-                                AddressBook.Remove(new Tuple<string, string>(CurrentUser.Item1, CurrentUser.Item2));
-
-                            }
-                            else Console.WriteLine("Osoba nije pronađena (već je promijenjena ili izbrisana)!");
-                            Continue();
+                            RemoveInput(AddressBook);
                         }
 
                         else option = "1";
