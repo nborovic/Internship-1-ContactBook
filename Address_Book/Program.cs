@@ -89,17 +89,18 @@ namespace Address_Book
             var inputedPhoneNumber = Console.ReadLine().Trim();
             var formatedPhoneNumber = FormatPhoneNumber(inputedPhoneNumber);
             var phoneNumber = CheckIfPhoneNumberValid(formatedPhoneNumber);
-            var taken = true;
+            var taken = false;
 
             foreach (var pair in AddressBook)
             {
-                if (phoneNumber != pair.Value.Item2)
-                    taken = false;
+                if (phoneNumber == pair.Value.Item2)
+                    taken = true;
             }
 
             while (taken == true) 
             {
 
+                taken = false;
                 Console.Write("Broj mobitela je već iskorišten, ponovite unos: ");
                 inputedPhoneNumber = Console.ReadLine().Trim();
                 formatedPhoneNumber = FormatPhoneNumber(inputedPhoneNumber);
@@ -107,8 +108,8 @@ namespace Address_Book
 
                 foreach (var pair in AddressBook)
                 {
-                    if (phoneNumber != pair.Value.Item2)
-                        taken = false;
+                    if (phoneNumber == pair.Value.Item2)
+                        taken = true;
                 }
 
             } 
