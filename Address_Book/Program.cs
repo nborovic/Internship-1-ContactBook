@@ -122,7 +122,7 @@ namespace Address_Book
 
         static void ChangeContactInfo(Dictionary<Tuple<string, string>, Tuple<string, Int64>> AddressBook, Tuple<string, string, string, Int64> CurrentUser)
         {
-            Console.WriteLine(CurrentUser.Item1 + " " + CurrentUser.Item2);
+
             var CurrentKey = new Tuple<string, string>(CurrentUser.Item1, CurrentUser.Item2);
 
             if (AddressBook.ContainsKey(CurrentKey)) { 
@@ -171,7 +171,9 @@ namespace Address_Book
         {
             bool ifPersonExists = false;
             Console.Write("Unesite broj tražene osobe: ");
-            var phoneNumber = Int64.Parse(Console.ReadLine());
+            var inputedPhoneNumber = Console.ReadLine();
+            var phoneNumber = Int64.Parse(FormatPhoneNumber(inputedPhoneNumber));
+            
 
             foreach (var pair in AddressBook)
             {
